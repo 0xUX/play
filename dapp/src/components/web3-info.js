@@ -18,12 +18,12 @@ function Msg(props) {
 
     // When connected evaluate state from web3
     if(web3State.isConnected && web3) {
-        if (web3.currentProvider) { status = 'gotProvider' };
-        if (web3.currentProvider.isMetaMask) { status = 'gotMetaMask' };
-        if (web3.currentProvider && accounts.length) { status = 'ready' };
+        if(web3.currentProvider) { status = 'gotProvider' };
+        if(web3.currentProvider.isMetaMask) { status = 'gotMetaMask' };
+        if(web3.currentProvider && accounts.length) { status = 'ready' };
+        if(error) { status = 'web3Error' };
     };
 
-    if(error) { status = 'web3Error' };
         
     const msgs = {
         isLoading: {

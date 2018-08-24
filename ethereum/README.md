@@ -18,7 +18,16 @@ nvm use 9
 node compile.js
 ```
 
-The resulting compiles contracts can bbe found in the `build` directory.
+The resulting compiled contracts can be found in the `build` directory.
 
 ## Deploy
 
+The School.sol contract can be deployed to Rinkeby by:
+
+```
+cd ethereum
+nvm use 9
+node deploy.js
+```
+
+Make a note of the address of the contract after deployment.

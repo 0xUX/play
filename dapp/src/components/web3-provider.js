@@ -127,7 +127,7 @@ class Web3Provider extends React.Component {
             this.initWeb3(Web3.givenProvider);
         } else {
             // RPC fallback (e.g. INFURA node)
-            this.initWeb3(new Web3(new Web3.providers.HttpProvider(this.props.defaultWeb3Provider)));
+            this.initWeb3(new Web3.providers.HttpProvider(this.props.defaultWeb3Provider));
 
             // Breaking changes in MetaMask => see: https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
             // Listen for provider injection

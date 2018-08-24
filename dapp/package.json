@@ -23,7 +23,7 @@
         "regenerator-runtime": "^0.12.1",
         "semantic-ui-css": "^2.3.3",
         "semantic-ui-react": "^0.82.2",
-        "web3": "^1.0.0-beta.35"
+        "web3": "1.0.0-beta.33"
     },
     "devDependencies": {
         "babel-core": "^6.26.3",

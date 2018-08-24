@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { Message, Icon } from 'semantic-ui-react';
+import { Message, Icon, Grid, Segment, Loader } from 'semantic-ui-react';
 import { withWeb3 } from './web3-provider';
+import { Subscribe } from './subscription';
 
 function Msg(props) {
     const { web3, web3State, currentProvider, accounts, network, error } = props;
@@ -18,13 +19,13 @@ function Msg(props) {
 
     // When connected evaluate state from web3
     if(web3State.isConnected && web3) {
-        if(web3.currentProvider) { status = 'gotProvider' };
-        if(web3.currentProvider.isMetaMask) { status = 'gotMetaMask' };
-        if(web3.currentProvider && accounts.length) { status = 'ready' };
-        if(error) { status = 'web3Error' };
+        if(web3.currentProvider) { status = 'gotProvider'; }
+        if(web3.currentProvider.isMetaMask) { status = 'gotMetaMask'; }
+        if(web3.currentProvider && accounts.length) { status = 'ready'; }
+        if(error) { status = 'web3Error'; }
     };
 
-        
+    
     const msgs = {
         isLoading: {
             header: 'Loading Ethereum provider',
@@ -67,7 +68,7 @@ function Msg(props) {
     const msg = msgs[status];
     
     return (
-        <Message icon>
+        <Message icon color={msg.icon=="warning" ? 'red' : 'olive' }>
             <Icon name={msg.icon} loading={msg.loading} />
             <Message.Content>
                 <Message.Header>{msg.header}</Message.Header>
@@ -78,23 +79,75 @@ function Msg(props) {
 }
 
 class Web3Info extends Component {
+    state = {
+        pastLogs: []
+    }
+    
+    getPastLogs = async () => {
+        if (this.state.pastLogs.length == 0) {
+            try {
+                const pastLogs = await this.props.web3.eth.getPastLogs({
+                    fromBlock: "0x0",
+                    //address: "0xB90761cFb3f327F901024668CD2Eb73A191F06aA",
+                    topics: ['0x0314a863b2e94adb6cd6b5a2e580b6c339838ac7a670b298d8eab29a01df03a8', null],
+                    //topics: ["0x78e5c07b8ab39db26099db8a63304491745498993e186895c0e5fe427c87deca"]
+                });
+                this.setState({ pastLogs });
+                console.log(pastLogs);
+            } catch(error) {
+                console.log(error);
+            }
+        }
+    }
+    
     render() {
-        const { web3, accounts } = this.props;
+        const { web3, web3State, currentProvider, accounts, network, error } = this.props;
 
-
-        if(accounts) {
-
-            // new block? show! @@@
-
-            
-
+        let subscription = <Loader active inline="centered" content='Loading' />;
+        if(accounts.length) {           
+            subscription = <Subscribe web3={web3} getPastLogs={this.getPastLogs} pastLogs={this.state.pastLogs} />;
+            // new block? show! => get all new logged events? @@@
         }
         return (
-            <div>
-                <Msg {...this.props} />
-            </div>
+        <div>
+          <Msg
+            web3={web3}
+            web3State={web3State}
+            currentProvider={currentProvider}
+            accounts={accounts}
+            network={network}
+            error={error}
+            />
+            <Grid  container stackable>
+                <Grid.Row>
+                    <Grid.Column>
+                        <Segment>{subscription}</Segment>
+                    </Grid.Column>
+                </Grid.Row>
+                <Grid.Row columns={3}>
+                    <Grid.Column>
+                        <Segment>Content</Segment>
+                    </Grid.Column>
+                    <Grid.Column>
+                        <Segment>Content</Segment>
+                    </Grid.Column>
+                    <Grid.Column>
+                        <Segment>Content</Segment>
+                    </Grid.Column>
+                </Grid.Row>
+                <Grid.Row columns={2}>
+                    <Grid.Column>
+                        <Segment>Content</Segment>
+                    </Grid.Column>
+                    <Grid.Column>
+                        <Segment>Content</Segment>
+                    </Grid.Column>
+                </Grid.Row>
+            </Grid>
+        </div>
         );
     }
 }
+
 
 export default withWeb3(Web3Info);

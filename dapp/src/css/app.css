@@ -1,3 +1,6 @@
-.gray {
-    background-color: gray;
+body {
+    background: #f7f7f7 !important;
+}
+.ui.icon.header .circular.icon {
+    background-color: white;
 }

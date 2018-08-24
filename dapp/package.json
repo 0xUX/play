@@ -6,7 +6,7 @@
     "sideEffects": [
         "*.css"
     ],
-    "repository": "https://github.com/0xUX/blockchain-escrow",
+    "repository": "https://github.com/0xUX/play",
     "license": "Apache-2.0",
     "scripts": {
         "test": "mocha",

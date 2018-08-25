@@ -20,6 +20,16 @@ node compile.js
 
 The resulting compiled contracts can be found in the `build` directory.
 
+## Test
+
+Run the tests for the contracts:
+
+```
+cd ethereum
+nvm use 9
+yarn test
+```
+
 ## Deploy
 
 The School.sol contract can be deployed to Rinkeby by:

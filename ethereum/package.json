@@ -3,6 +3,9 @@
     "version": "0.0.1",
     "main": "index.js",
     "license": "Apache-2.0",
+    "scripts": {
+        "test": "mocha"
+    },
     "dependencies": {
         "fs-extra": "^7.0.0",
         "ganache-cli": "^6.1.8",

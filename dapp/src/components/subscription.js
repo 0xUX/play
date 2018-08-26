@@ -1,14 +1,17 @@
 import React, { Component } from "react";
-import Web3 from 'web3'; // for this to work we need 1.0.0-beta.33 (so not the latest) see https://github.com/ethereum/web3.js/issues/1559
+import Web3 from 'web3'; // for this to work we need 1.0.0-beta.33 (so not the latest) see https://github.com/ethereum/web3.js/issues/1559 @@@
+
+// @@@ TODO: when user changes network on MM, do the same on Infura for subscriptions
 
 const RINKEBY_WSS = "wss://rinkeby.infura.io/ws"; // https://infura.io/docs/wss/introduction
 let web3;
 
-export class Subscribe extends Component {
+export default class Subscribe extends Component {
     state = {
-        block: 0
+        block: 0,
+        pastLogs: []
     }
-    
+
     componentDidMount() {
         console.log('Subscribe re-mounted');
         let provider = new Web3.providers.WebsocketProvider(RINKEBY_WSS);
@@ -28,7 +31,7 @@ export class Subscribe extends Component {
 
 
         // Get past logs (only once), uses the metamask provider
-        if(this.props.pastLogs.length == 0) {
+        if(this.state.pastLogs.length == 0) {
             this.getPastLogs();
         }
 
@@ -60,14 +63,28 @@ export class Subscribe extends Component {
         });
 
         // NEXT @@@@@@@@@
-        // https://web3js.readthedocs.io/en/1.0/web3-eth-subscribe.html#subscribe-syncing
-        
+        // - https://web3js.readthedocs.io/en/1.0/web3-eth-subscribe.html#subscribe-syncing
+        // - combine logs found with getPastLogs and subscribe
     }
 
     getPastLogs = async () => {
-        await this.props.getPastLogs();    
+        if (this.state.pastLogs.length == 0) {
+            try {
+                // this uses the web3 provider passed in from web3-info, so MM
+                const pastLogs = await this.props.web3.eth.getPastLogs({
+                    fromBlock: "0x0",
+                    //address: "0xB90761cFb3f327F901024668CD2Eb73A191F06aA",
+                    topics: ['0x0314a863b2e94adb6cd6b5a2e580b6c339838ac7a670b298d8eab29a01df03a8', null],
+                    //topics: ["0x78e5c07b8ab39db26099db8a63304491745498993e186895c0e5fe427c87deca"]
+                });
+                this.setState({ pastLogs });
+                console.log(pastLogs);
+            } catch(error) {
+                console.log(error);
+            }
+        }
     }
-        
+            
     render() {
         // @@@ get network from web3 instance vvv @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         return (

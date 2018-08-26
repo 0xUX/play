@@ -4,6 +4,9 @@ import Web3 from 'web3';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 import PropTypes from 'prop-types';
 
+// @@@ TODO:
+// - include subscription provider (if some props says we want it)
+// - cleanup context, just two toplevel vars: web3MM and web3Infure
 
 const Web3Context = React.createContext(null);
 

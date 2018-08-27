@@ -32,7 +32,7 @@ yarn test
 
 ## Deploy
 
-The School.sol contract can be deployed to Rinkeby by:
+The School.sol contract can be deployed to a local test network by:
 
 ```
 cd ethereum

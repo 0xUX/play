@@ -1,9 +1,11 @@
 import React, { Component } from "react";
+import PropTypes from 'prop-types';
 import { Grid, Segment } from 'semantic-ui-react';
 import { withWeb3 } from './web3-provider';
 import Subscribe from './subscription';
+import School from './school';
 
-class Web3Info extends Component {
+class Layout extends Component {
     
     
     render() {
@@ -11,21 +13,21 @@ class Web3Info extends Component {
 
         return (
             <div>
-                <Grid  container stackable>
-                    <Grid.Row>
+                <Grid container stackable>
+                    <Grid.Row columns={3}>
                         <Grid.Column>
                             <Segment><Subscribe web3={web3} /></Segment>
                         </Grid.Column>
+                        <Grid.Column>
+                            <Segment>Content</Segment>
+                        </Grid.Column>
+                        <Grid.Column>
+                            <Segment>Content</Segment>
+                        </Grid.Column>
                     </Grid.Row>
-                    <Grid.Row columns={3}>
+                    <Grid.Row>
                         <Grid.Column>
-                            <Segment>Content</Segment>
-                        </Grid.Column>
-                        <Grid.Column>
-                            <Segment>Content</Segment>
-                        </Grid.Column>
-                        <Grid.Column>
-                            <Segment>Content</Segment>
+                            <Segment><School /></Segment>
                         </Grid.Column>
                     </Grid.Row>
                     <Grid.Row columns={2}>
@@ -42,5 +44,8 @@ class Web3Info extends Component {
     }
 }
 
+Layout.propTypes = {
+    // @@@ todo add after refactoring web3-provider props
+};
 
-export default withWeb3(Web3Info);
+export default withWeb3(Layout);

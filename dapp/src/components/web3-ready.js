@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Message, Icon, Loader } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
+import { Message, Icon } from 'semantic-ui-react';
 import { withWeb3 } from './web3-provider';
 
 function Msg(props) {
@@ -67,7 +68,7 @@ function Msg(props) {
     const msg = msgs[status];
     
     return (
-        <Message icon color={msg.icon=="warning" ? 'red' : 'olive' }>
+        <Message icon={!!msg.icon} color={msg.icon=="warning" ? 'red' : 'olive' }>
             <Icon name={msg.icon} loading={msg.loading} />
             <Message.Content>
                 <Message.Header>{msg.header}</Message.Header>
@@ -77,23 +78,31 @@ function Msg(props) {
     );
 }
 
-class Web3Ready extends Component {
-    render() {
-        const { web3, web3State, currentProvider, accounts, network, error } = this.props; // from the web3-provider
-        return (
-            <div>
-                <Msg
-                    web3={web3}
-                    web3State={web3State}
-                    currentProvider={currentProvider}
-                    accounts={accounts}
-                    network={network}
-                    error={error}
-                />
-                {accounts.length ? this.props.children : null}
-            </div>
-        );
-    }
+Msg.propTypes = {
+    accounts: PropTypes.array.isRequired,
+    // @@@ todo add after refactoring web3-provider props
+};
+
+function Web3Ready(props) {
+    const { web3, web3State, currentProvider, accounts, network, error } = props; // from the web3-provider
+    return (
+        <div>
+            <Msg
+                web3={web3}
+                web3State={web3State}
+                currentProvider={currentProvider}
+                accounts={accounts}
+                network={network}
+                error={error}
+            />
+            {accounts.length > 0 && props.children}
+        </div>
+    );
 }
+
+Web3Ready.propTypes = {
+    accounts: PropTypes.array.isRequired,
+    // @@@ todo add after refactoring web3-provider props
+};
 
 export default withWeb3(Web3Ready);

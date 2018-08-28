@@ -1,9 +1,16 @@
 import React, { Component } from "react";
-import Web3 from 'web3'; // for this to work we need 1.0.0-beta.33 (so not the latest) see https://github.com/ethereum/web3.js/issues/1559 @@@
+import PropTypes from 'prop-types';
+import Web3 from 'web3'; // for subscriptions to work we need 1.0.0-beta.33 (so not the latest) see https://github.com/ethereum/web3.js/issues/1559 @@@
+import { Loader } from 'semantic-ui-react';
+import { networkDetails } from '../lib/network';
 
-// @@@ TODO: when user changes network on MM, do the same on Infura for subscriptions
+// @@@ TODO:
+// - when user changes network on MM, do the same on Infura for subscriptions
+// - https://web3js.readthedocs.io/en/1.0/web3-eth-subscribe.html#subscribe-syncing
+// - combine logs found with getPastLogs and subscribe
+// - error handling: each network error flow gets its own state
 
-const RINKEBY_WSS = "wss://rinkeby.infura.io/ws"; // https://infura.io/docs/wss/introduction
+let subscriptionNetwork = networkDetails('rinkeby');
 let web3;
 
 export default class Subscribe extends Component {
@@ -13,22 +20,19 @@ export default class Subscribe extends Component {
     }
 
     componentDidMount() {
-        console.log('Subscribe re-mounted');
-        let provider = new Web3.providers.WebsocketProvider(RINKEBY_WSS);
+        let provider = new Web3.providers.WebsocketProvider(subscriptionNetwork.websocketUrl);
         web3 = new Web3(provider);
-        provider.on('error', e => console.log('WS Error', e));
+        provider.on('error', e => console.log('Websocket error:', e));
         provider.on('end', e => {
-            console.log('WS closed');
-            console.log('Attempting to reconnect...');
-            provider = new Web3.providers.WebsocketProvider(RINKEBY_WSS);
+            console.log('Websocket closed. Attempting to reconnect...'); // @@@ TODO improve this
+            provider = new Web3.providers.WebsocketProvider(subscriptionNetwork.websocketUrl);
 
             provider.on('connect', function () {
-                console.log('WSS Reconnected');
+                console.log('Websocket reconnected');
             });
             
             web3.setProvider(provider);
         });
-
 
         // Get past logs (only once), uses the metamask provider
         if(this.state.pastLogs.length == 0) {
@@ -36,19 +40,19 @@ export default class Subscribe extends Component {
         }
 
         // Get newBlockHeaders
-        const blocksSubscription = web3.eth.subscribe('newBlockHeaders', (error, result) => {
+        this.blocksSubscription = web3.eth.subscribe('newBlockHeaders', (error, result) => {
             if(!error) {
-                console.log(result);
+                //console.log(result);
                 this.setState({ block: result.number});
             } else {
                 console.log('Error:', error);          
             }
         }).on("data", function (transaction) {
-            console.log(transaction);
+            //console.log(transaction);
         });
 
         // Get logs for specific topics
-        const logsSubscription = web3.eth.subscribe('logs', {
+        this.logsSubscription = web3.eth.subscribe('logs', {
             fromBlock: "0x0",
             //address: "0xB90761cFb3f327F901024668CD2Eb73A191F06aA",
             topics: ['0x0314a863b2e94adb6cd6b5a2e580b6c339838ac7a670b298d8eab29a01df03a8', null],            
@@ -61,12 +65,19 @@ export default class Subscribe extends Component {
         }).on("data", function (transaction) {
             console.log(transaction);
         });
-
-        // NEXT @@@@@@@@@
-        // - https://web3js.readthedocs.io/en/1.0/web3-eth-subscribe.html#subscribe-syncing
-        // - combine logs found with getPastLogs and subscribe
     }
 
+    componentWillUnmount() {
+        this.blocksSubscription.unsubscribe(function(error, success){
+            if(error)
+                console.log('Error while unsubscribing from "newBlockHeaders": ', error);
+        });
+        this.logsSubscription.unsubscribe(function(error, success){
+            if(error)
+                console.log('Error while unsubscribing from "logs": ', error);
+        });
+    }
+    
     getPastLogs = async () => {
         if (this.state.pastLogs.length == 0) {
             try {
@@ -84,16 +95,19 @@ export default class Subscribe extends Component {
             }
         }
     }
-            
+    
     render() {
-        // @@@ get network from web3 instance vvv @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        const { block } = this.state;
+        const href = `${subscriptionNetwork.etherscanUrl}/block/${block}`;
         return (
-            <div>Current block (Rinkeby): {this.state.block}</div>
+            <div>{subscriptionNetwork.shortName} Current Block: {block ? <a href={href} target="_blank">{block}</a> : <Loader active size="tiny" inline />}</div>
         );
     }
 };
 
-
+Subscribe.propTypes = {
+    // @@@ todo add after refactoring web3-provider props
+};
 
 
 // async function queryInfo() {

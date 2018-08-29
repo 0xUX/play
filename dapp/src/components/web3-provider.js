@@ -3,44 +3,14 @@ import React from 'react';
 import Web3 from 'web3';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 import PropTypes from 'prop-types';
+import { networkDetails } from '../lib/network';
 
+// @@@ TODO:
+// - include subscription provider (if some props says we want it)
+// - cleanup context, just two toplevel vars: web3MM and web3Infure
 
 const Web3Context = React.createContext(null);
 
-function networkDetails(networkId) {
-    switch (networkId) {
-    case 'main':
-        return {
-            id: networkId,
-            name: 'Ethereum Main Net',
-            etherscanUrl: 'https://etherscan.io'
-        };
-    case 'ropsten':
-        return {
-            id: networkId,
-            name: 'Ropsten Test Net',
-            etherscanUrl: 'https://ropsten.etherscan.io'
-        };
-    case 'rinkeby':
-        return {
-            id: networkId,
-            name: 'Rinkeby Test Net',
-            etherscanUrl: 'https://rinkeby.etherscan.io'
-        };
-    case 'kovan':
-        return {
-            id: networkId,
-            name: 'Kovan Test Net',
-            etherscanUrl: 'https://kovan.etherscan.io'
-        };
-    default:
-      return {
-            id: networkId,
-            name: 'unknown',
-            etherscanUrl: ''
-      };
-  }
-}
 
 class Web3Provider extends React.Component {
     state = {
@@ -110,7 +80,7 @@ class Web3Provider extends React.Component {
             if (web3.currentProvider.publicConfigStore) {
                 web3.currentProvider.publicConfigStore.on(
                     'update', (...args) => {
-                        console.log('publicConfigStore update:', JSON.stringify(args));
+                        //console.log('publicConfigStore update:', JSON.stringify(args));
                         this.updateAccountsNetwork();
                     }
                 );
@@ -127,7 +97,7 @@ class Web3Provider extends React.Component {
             this.initWeb3(Web3.givenProvider);
         } else {
             // RPC fallback (e.g. INFURA node)
-            this.initWeb3(new Web3(new Web3.providers.HttpProvider(this.props.defaultWeb3Provider)));
+            this.initWeb3(new Web3.providers.HttpProvider(this.props.defaultWeb3Provider));
 
             // Breaking changes in MetaMask => see: https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
             // Listen for provider injection
@@ -186,9 +156,15 @@ export const withWeb3 = (WrappedComponent) => {
         }
     }
 
+     Web3Consumer.displayName = `withWeb3(${getDisplayName(WrappedComponent)})`;
+    
     if (WrappedComponent.defaultProps) {
         Web3Consumer.defaultProps = WrappedComponent.defaultProps ;
     }
 
     return hoistNonReactStatics(Web3Consumer, WrappedComponent);
 };
+
+function getDisplayName(WrappedComponent) {
+  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+}

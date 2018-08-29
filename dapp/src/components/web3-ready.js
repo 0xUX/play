@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from 'prop-types';
 import { Message, Icon } from 'semantic-ui-react';
 import { withWeb3 } from './web3-provider';
 
@@ -18,13 +19,13 @@ function Msg(props) {
 
     // When connected evaluate state from web3
     if(web3State.isConnected && web3) {
-        if(web3.currentProvider) { status = 'gotProvider' };
-        if(web3.currentProvider.isMetaMask) { status = 'gotMetaMask' };
-        if(web3.currentProvider && accounts.length) { status = 'ready' };
-        if(error) { status = 'web3Error' };
+        if(web3.currentProvider) { status = 'gotProvider'; }
+        if(web3.currentProvider.isMetaMask) { status = 'gotMetaMask'; }
+        if(web3.currentProvider && accounts.length) { status = 'ready'; }
+        if(error) { status = 'web3Error'; }
     };
 
-        
+    
     const msgs = {
         isLoading: {
             header: 'Loading Ethereum provider',
@@ -67,7 +68,7 @@ function Msg(props) {
     const msg = msgs[status];
     
     return (
-        <Message icon>
+        <Message icon={!!msg.icon} color={msg.icon=="warning" ? 'red' : 'olive' }>
             <Icon name={msg.icon} loading={msg.loading} />
             <Message.Content>
                 <Message.Header>{msg.header}</Message.Header>
@@ -77,24 +78,31 @@ function Msg(props) {
     );
 }
 
-class Web3Info extends Component {
-    render() {
-        const { web3, accounts } = this.props;
+Msg.propTypes = {
+    accounts: PropTypes.array.isRequired,
+    // @@@ todo add after refactoring web3-provider props
+};
 
-
-        if(accounts) {
-
-            // new block? show! @@@
-
-            
-
-        }
-        return (
-            <div>
-                <Msg {...this.props} />
-            </div>
-        );
-    }
+function Web3Ready(props) {
+    const { web3, web3State, currentProvider, accounts, network, error } = props; // from the web3-provider
+    return (
+        <div>
+            <Msg
+                web3={web3}
+                web3State={web3State}
+                currentProvider={currentProvider}
+                accounts={accounts}
+                network={network}
+                error={error}
+            />
+            {accounts.length > 0 && props.children}
+        </div>
+    );
 }
 
-export default withWeb3(Web3Info);
+Web3Ready.propTypes = {
+    accounts: PropTypes.array.isRequired,
+    // @@@ todo add after refactoring web3-provider props
+};
+
+export default withWeb3(Web3Ready);

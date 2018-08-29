@@ -22,11 +22,11 @@ beforeEach(async () => {
     
     school = await new web3.eth.Contract(JSON.parse(compiledSchool.interface))
                            .deploy({ data: compiledSchool.bytecode })
-                           .send({ from: accounts[0], gas: '1000000' });
+                           .send({ from: accounts[0], gas: '3000000' });
         
     // The school contract creates a Course contract and triggers the 'AtAdress' event
     await school.methods.newCourse(NAME, INSTRUCTOR).send({
-        from: accounts[0], gas: '1000000'
+        from: accounts[0], gas: '3000000'
     });
 
     // Get the address of the deployed Course contract
@@ -61,11 +61,12 @@ describe('Course', () => {
         // assert.equal(courseAddress, addressFromEvent);
     });
     
-    it('course instance has the correct name and instructor', async () => {
-        const name = await course.methods.name().call();
-        assert.equal(name, NAME);
-        const instructor = await course.methods.instructor().call();
-        assert.equal(instructor, INSTRUCTOR);
+    it('course instance has the correct owner, name, and instructor', async () => {
+        const { _name, _instructor } = await course.methods.info().call();
+        assert.equal(_name, NAME);
+        assert.equal(_instructor, INSTRUCTOR);
+        const owner = await course.methods.contract_owner().call();
+        assert.equal(owner, accounts[0]);
     });
     
     it('course instructor can be updated by owner and "Update" event was emitted', async () => {

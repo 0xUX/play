@@ -13,7 +13,7 @@ contract Course {
 
     string public name;
     string public instructor;
-    address contract_owner;
+    address public contract_owner;
 
     modifier ownerOnly() {
         require(msg.sender == contract_owner, "not authorized.");
@@ -32,7 +32,12 @@ contract Course {
         instructor = _instructor;
         emit Updated(name, _instructor);
     }
-    
+
+    function info() external view returns(string _instructor, string _name) {
+        _name = name;
+        _instructor = instructor;
+    }
+
     function exit() external ownerOnly {
         selfdestruct(contract_owner);
     }

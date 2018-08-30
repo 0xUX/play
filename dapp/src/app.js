@@ -11,19 +11,17 @@ import './css/app.css';
 class App extends Component {    
     render() {        
         return (
-            <React.StrictMode>
-                <Container style={{ padding: '3em 0em' }}>
-                    <Header as='h2' icon textAlign='center'>
-                        <Icon name='ethereum' circular />
-                        <Header.Content>Web3 playground</Header.Content>
-                    </Header>
-                    <Web3Provider defaultWeb3Provider="http://localhost:9545">
-                        <Web3Ready>
-                            <Layout />
-                        </Web3Ready>
-                    </Web3Provider>
-                </Container>
-            </React.StrictMode>
+            <Container style={{ padding: '3em 0em' }}>
+                <Header as='h2' icon textAlign='center'>
+                    <Icon name='ethereum' circular />
+                    <Header.Content>Web3 playground</Header.Content>
+                </Header>
+                <Web3Provider defaultWeb3Provider="http://localhost:9545">
+                    <Web3Ready>
+                        <Layout />
+                    </Web3Ready>
+                </Web3Provider>
+            </Container>
         );
     }
 }

@@ -33,7 +33,7 @@ export default class Subscribe extends Component {
             
             web3.setProvider(provider);
         });
-
+        
         // Get past logs (only once), uses the metamask provider
         if(this.state.pastLogs.length == 0) {
             this.getPastLogs();
@@ -63,7 +63,7 @@ export default class Subscribe extends Component {
                 console.log('Error:', error);          
             }
         }).on("data", function (transaction) {
-            console.log(transaction);
+            console.log(transaction); // @@@ same as result
         });
     }
 

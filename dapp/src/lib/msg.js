@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
-import { Message, Button, Modal } from 'semantic-ui-react';
+import { Message, Button, Modal, Form } from 'semantic-ui-react';
 
 export function Msg(props) {
     if(!props.msg) return null;
@@ -29,7 +29,7 @@ export class ConfirmModal extends Component {
         
         return (
             <div>
-              <Button onClick={this.show} size={buttonSize} color={buttonColor} compact={buttonCompact} >{buttonTxt}</Button>
+                <Button onClick={this.show} size={buttonSize} color={buttonColor} compact={buttonCompact} >{buttonTxt}</Button>
                 <Modal size={size} open={open} onClose={this.close}>
                     <Modal.Header>{header}</Modal.Header>
                     <Modal.Content>
@@ -49,13 +49,76 @@ ConfirmModal.defaultProps = {
     size: 'mini',
     buttonSize: 'small',
     buttonColor: null,
-    compact: null
+    buttonCompact: null
 };
 
 ConfirmModal.propTypes = {
     header: PropTypes.string.isRequired,
     content: PropTypes.node.isRequired,
     onConfirm: PropTypes.func.isRequired,
+    size: PropTypes.string,
+    buttonSize: PropTypes.string,
+    buttonTxt: PropTypes.string.isRequired,
+    buttonColor: PropTypes.string,
+    buttonCompact: PropTypes.bool,
+    contract: PropTypes.object.isRequired
+};
+
+export class SetInstructorModal extends Component {
+    state = {
+        open: false,
+        instructor: ''
+    }
+    close = () => this.setState({ open: false, instructor: '' })
+    show = () => this.setState({ open: true });
+
+    handleChange = (e) => {
+        const value = e.target.value;
+        this.setState({ instructor:value });
+    }
+    
+    render() {
+        const { onUpdate, size, header, content, buttonTxt, buttonColor, buttonSize, buttonCompact, contract } = this.props;
+        const { open } = this.state;
+        
+        return (
+            <React.Fragment>
+                <Button onClick={this.show} size={buttonSize} color={buttonColor} compact={buttonCompact} >{buttonTxt}</Button>
+                <Modal size={size} open={open} onClose={this.close}>
+                    <Modal.Header>{header}</Modal.Header>
+                    <Modal.Content>
+                        <p>{content}</p>
+                        <Form id="Form" onSubmit={() => {this.close(); onUpdate(contract, this.state.instructor);}}>
+                            <Form.Field required>
+                                <label>Instructor</label>
+                                <Form.Input placeholder='Instructor'
+                                            value={this.state.instructor}
+                                            onChange={this.handleChange}
+                                            name="instructor" />
+                            </Form.Field>
+                        </Form>
+                    </Modal.Content>
+                    <Modal.Actions>
+                        <Button onClick={this.close}>Cancel</Button>
+                        <Button positive type="submit" content='Update' form="Form" />
+                    </Modal.Actions>
+                </Modal>
+            </React.Fragment>
+        );
+    }
+};
+
+SetInstructorModal.defaultProps = {
+    size: 'small',
+    buttonSize: 'mini',
+    buttonColor: null,
+    buttonCompact: true
+};
+
+SetInstructorModal.propTypes = {
+    header: PropTypes.string.isRequired,
+    content: PropTypes.node.isRequired,
+    onUpdate: PropTypes.func.isRequired,
     size: PropTypes.string,
     buttonSize: PropTypes.string,
     buttonTxt: PropTypes.string.isRequired,

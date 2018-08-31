@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from 'prop-types';
 import { Grid, Segment, Loader, Form, Button, Header, List, Dimmer } from 'semantic-ui-react';
 import { withWeb3 } from './web3-provider';
-import { Msg, ConfirmModal } from '../lib/msg';
+import { Msg, ConfirmModal, SetInstructorModal } from '../lib/msg';
 import SchoolContract from '../contracts/school';
 import CourseContract from '../contracts/course';
 
@@ -51,10 +51,11 @@ class CreateCourseForm extends Component {
         
         if (!Object.keys(invalid).every(k => invalid[k] === false)) return;
 
-        this.setState({ submitStatus: 'loading' });
+        this.setState({ submitStatus: 'loading', error: null });
         
         try {
             await school.methods.newCourse(name, instructor).send({ from: accounts[0] });
+            this.setState({ name: '', instructor: '' });
         } catch(error) {
             this.setState({ error: String(error) });
         }
@@ -73,18 +74,30 @@ class CreateCourseForm extends Component {
         
         return (
             <div>
-              <Header as='h2'>Create New Course</Header>
-              <Msg msg={error} head="Error" negative />
+                <Header as='h2'>Create New Course</Header>
+                <Msg msg={error} head="Error" negative />
                 <Form onSubmit={this.handleSubmit}>
                     <Form.Field required>
                         <label>Course Name</label>
-                        <Form.Input placeholder='Course Name' value={this.state.name} onChange={this.handleChange} name="name" error={this.showInputError('name')} />
+                        <Form.Input placeholder='Course Name'
+                                    value={this.state.name}
+                                    onChange={this.handleChange}
+                                    name="name"
+                                    readOnly={submitStatus=='loading'}
+                                    error={this.showInputError('name')} />
                     </Form.Field>
                     <Form.Field required>
                         <label>Instructor</label>
-                        <Form.Input placeholder='Instructor' value={this.state.instructor} onChange={this.handleChange} name="instructor" error={this.showInputError('instructor')} />
+                        <Form.Input placeholder='Instructor'
+                                    value={this.state.instructor}
+                                    onChange={this.handleChange}
+                                    name="instructor"
+                                    readOnly={submitStatus=='loading'}
+                                    error={this.showInputError('instructor')} />
                     </Form.Field>
-                    <Button type='submit' disabled={submitStatus=='disabled'} loading={submitStatus=='loading'} >Add</Button>
+                    <Button type='submit'
+                            disabled={submitStatus=='disabled'}
+                            loading={submitStatus=='loading'} >Add</Button>
                 </Form>
             </div>
         );
@@ -130,7 +143,13 @@ class CourseItem extends Component {
                 </List.Content>
             );
             setInstructorButton = (
-                <Button size="mini" compact onClick={setInstructor}>Change</Button>
+                <SetInstructorModal
+                    buttonTxt="Change"
+                    onUpdate={setInstructor}
+                    contract={course}
+                    header="Update Instructor"
+                    content={`Change the instructor for the course "${title}":`}
+                />
             );
         }        
         return (
@@ -285,9 +304,55 @@ class School extends Component {
         }
     }
 
+    setInstructor = async (contract, instructor) => {
+        // @@@ TODO:
+        // - real error handling
+        // - make a generic function for updates; merging this function with killContract
+        if(instructor.length < 3 || instructor.length > 32) { return; }
+        
+        const { web3, accounts } = this.props;
+
+        // remove previous error msg
+        this.setState({ error: null });
+
+        const address = contract.address;        
+        const course = CourseContract(web3, address);
+        const prevInstructor = this.state.courses[address].instructor;
+        let newState = {
+            name: contract.name,
+            instructor,
+            owner: contract.owner,
+            loading: `${contract.name} (Updating instructor in progress)`,
+            address
+        };
+        this.setState(prevState => (
+            { courses: { ...prevState.courses, [address]: newState}}
+        ));
+
+        try {
+            await course.methods.setInstructor(instructor).send({
+                from: accounts[0]
+            });
+            // @@@ TODO
+            // - signal somehow that courses list needs to be reloaded
+        } catch(error) {
+            // strip fluff
+            error = String(error).replace('Error: Returned error: Error: ', '');
+            // restore course in state
+            delete newState.loading;
+            newState.instructor = prevInstructor;
+            this.setState(prevState => (
+                { error, courses: { ...prevState.courses, [address]: newState}}
+            ));            
+        }
+    }
+        
     killContract = async (contract) => {
         const { web3, accounts } = this.props;
 
+        // remove previous error msg
+        this.setState({ error: null });
+        
         const address = contract.address;        
         const course = CourseContract(web3, address);
         let newState = {
@@ -334,6 +399,7 @@ class School extends Component {
                     courses={courses}
                     error={error}
                     killContract={this.killContract}
+                    setInstructor={this.setInstructor}
                     loading={loading}
                   />
             </div>

@@ -15,7 +15,9 @@ function Msg(props) {
         status = 'isLoading';
     } else if(web3State.error) {
         status = 'connectionError';
-    };
+    } else {
+        status = 'noProvider';
+    }
 
     // When connected evaluate state from web3
     if(web3State.isConnected && web3) {
@@ -32,6 +34,12 @@ function Msg(props) {
             body: <span>Checking if your browser has the <a href="https://metamask.io/">MetaMask</a> extension installed...</span>,
             icon: 'asterisk',
             loading: true
+        },
+        noProvider: {
+            header: 'No Ethereum provider found',
+            body: <span>Your need to install the <a href="https://metamask.io/">MetaMask</a> extension to be able to use this application.</span>,
+            icon: 'asterisk',
+            loading: false
         },
         gotProvider: {
             header: 'Found a provider',
@@ -85,19 +93,20 @@ Msg.propTypes = {
 
 function Web3Ready(props) {
     const { web3, web3State, currentProvider, accounts, network, error } = props; // from the web3-provider
-    return (
-        <div>
-            <Msg
-                web3={web3}
-                web3State={web3State}
-                currentProvider={currentProvider}
-                accounts={accounts}
-                network={network}
-                error={error}
-            />
-            {accounts.length > 0 && props.children}
-        </div>
-    );
+        
+        return (
+            <div>
+                <Msg
+                    web3={web3}
+                    web3State={web3State}
+                    currentProvider={currentProvider}
+                    accounts={accounts}
+                    network={network}
+                    error={error}
+                />
+                {accounts.length > 0 && props.children}
+            </div>
+        );
 }
 
 Web3Ready.propTypes = {

@@ -51,7 +51,7 @@ class Web3Provider extends React.Component {
         const web3 = new Web3(provider);
         
         this.setState({ web3 });
-
+        
         // We have a stable web3 interface now
         // Check network connection state
         try {
@@ -65,6 +65,7 @@ class Web3Provider extends React.Component {
             });
         } catch(error) {
             this.setState({
+                web3: null,
                 connection: {
                     isConnected: false,
                     isLoading: false,
@@ -96,19 +97,33 @@ class Web3Provider extends React.Component {
             // Use wallet-enabled browser provider
             this.initWeb3(Web3.givenProvider);
         } else {
-            // RPC fallback (e.g. INFURA node)
-            this.initWeb3(new Web3.providers.HttpProvider(this.props.defaultWeb3Provider));
+            const { defaultWeb3Provider } = this.props;
+            const whereAreWe = (location.hostname === "localhost" || location.hostname === "127.0.0.1") ? 'local' : 'server';
+            const whereWeWantToBe = (defaultWeb3Provider.indexOf("localhost") >= 0 || defaultWeb3Provider.indexOf("127.0.0.1") >= 0 ) ? 'local' : 'server';
+            if(whereAreWe == whereWeWantToBe) {
+                // RPC fallback (e.g. INFURA node)
+                this.initWeb3(new Web3.providers.HttpProvider(this.props.defaultWeb3Provider));
+            } else {
+                this.setState({                    
+                    connection: {
+                        isConnected: false,
+                        isLoading: false,
+                        error: false
+                    }
+                });
+            }
 
+            // @@@ TODO: implement when needed:
             // Breaking changes in MetaMask => see: https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
             // Listen for provider injection
-            window.addEventListener('message', ({ data }) => {
-                if (data && data.type && data.type === 'ETHEREUM_PROVIDER_SUCCESS') {
-                    this.initWeb3(window.ethereum);
-                }
-            });
-
+            // window.addEventListener('message', ({ data }) => {
+            //     if (data && data.type && data.type === 'ETHEREUM_PROVIDER_SUCCESS') {
+            //         this.initWeb3(window.ethereum);
+            //     }
+            // });
+            // 
             // Request provider
-            window.postMessage({ type: 'ETHEREUM_PROVIDER_REQUEST' }, '*');
+            // window.postMessage({ type: 'ETHEREUM_PROVIDER_REQUEST' }, '*');
         }
     }
 

@@ -8,15 +8,18 @@ import Web3Ready from './components/web3-ready';
 
 import './css/app.css';
 
-class App extends Component {    
-    render() {        
+//const RPC_FALLBACK_PROVIDER = 'https://rinkeby.infura.io/orDImgKRzwNrVCDrAk5Q';
+const RPC_FALLBACK_PROVIDER = "http://localhost:9545";
+
+class App extends Component {
+        render() {        
         return (
             <Container style={{ padding: '3em 0em' }}>
                 <Header as='h2' icon textAlign='center'>
                     <Icon name='ethereum' circular />
                     <Header.Content>Web3 playground</Header.Content>
                 </Header>
-                <Web3Provider defaultWeb3Provider="http://localhost:9545">
+                <Web3Provider defaultWeb3Provider={RPC_FALLBACK_PROVIDER}>
                     <Web3Ready>
                         <Layout />
                     </Web3Ready>

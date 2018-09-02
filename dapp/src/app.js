@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import _ from 'lodash-es';
 import {hot} from "react-hot-loader";
 import { Container, Header, Icon } from 'semantic-ui-react';
 import Web3Provider from './components/web3-provider';

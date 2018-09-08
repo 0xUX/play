@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import {hot} from "react-hot-loader";
 import { Container, Header, Icon } from 'semantic-ui-react';
 import Web3Provider from './components/web3-provider';
-import Layout from './components/layout';
 import Web3Ready from './components/web3-ready';
+import DataContainer from './components/container';
 
 import './css/app.css';
 
@@ -11,7 +11,7 @@ import './css/app.css';
 const RPC_FALLBACK_PROVIDER = "http://localhost:9545";
 
 class App extends Component {
-        render() {        
+    render() {        
         return (
             <Container style={{ padding: '3em 0em' }}>
                 <Header as='h2' icon textAlign='center'>
@@ -20,7 +20,7 @@ class App extends Component {
                 </Header>
                 <Web3Provider defaultWeb3Provider={RPC_FALLBACK_PROVIDER}>
                     <Web3Ready>
-                        <Layout />
+                        <DataContainer />
                     </Web3Ready>
                 </Web3Provider>
             </Container>

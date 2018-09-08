@@ -4,7 +4,7 @@ import { Message, Icon } from 'semantic-ui-react';
 import { withWeb3 } from './web3-provider';
 
 function Msg(props) {
-    const { web3, web3State, currentProvider, accounts, network, error } = props;
+    const { web3, web3State, currentProvider, accounts, network, web3_error } = props;
 
     let status = 'isLoading';
     
@@ -24,7 +24,7 @@ function Msg(props) {
         if(web3.currentProvider) { status = 'gotProvider'; }
         if(web3.currentProvider.isMetaMask) { status = 'gotMetaMask'; }
         if(web3.currentProvider && accounts.length) { status = 'ready'; }
-        if(error) { status = 'web3Error'; }
+        if(web3_error) { status = 'web3Error'; }
     };
 
     
@@ -67,7 +67,7 @@ function Msg(props) {
         },
         web3Error: {
             header: 'Something went wrong',
-            body: String(error),
+            body: String(web3_error),
             icon: 'warning',
             loading: false
         }
@@ -92,7 +92,7 @@ Msg.propTypes = {
 };
 
 function Web3Ready(props) {
-    const { web3, web3State, currentProvider, accounts, network, error } = props; // from the web3-provider
+    const { web3, web3State, currentProvider, accounts, network, web3_error } = props; // from the web3-provider
         
         return (
             <div>
@@ -102,9 +102,9 @@ function Web3Ready(props) {
                     currentProvider={currentProvider}
                     accounts={accounts}
                     network={network}
-                    error={error}
+                    web3_error={web3_error}
                 />
-                {accounts.length > 0 && props.children}
+                {accounts.length > 0 && !web3_error && props.children}
             </div>
         );
 }

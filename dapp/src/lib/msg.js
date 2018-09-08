@@ -94,7 +94,9 @@ export class SetInstructorModal extends Component {
                                 <Form.Input placeholder='Instructor'
                                             value={this.state.instructor}
                                             onChange={this.handleChange}
-                                            name="instructor" />
+                                            name="instructor"
+                                            autoFocus
+                                />
                             </Form.Field>
                         </Form>
                     </Modal.Content>

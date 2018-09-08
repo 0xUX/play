@@ -9,3 +9,16 @@ export const getEventAbi = (abi, event, stripIndexed=true) => {
     }
     return {};
 };
+
+
+export const getGasEstimate = async (web3, account, method, ...params) => {
+    const gasPrice = await web3.eth.getGasPrice();    
+    const estimateGas = await method.apply(this, params).estimateGas({
+        from: account               
+    });
+    
+    const costEstimate = gasPrice * estimateGas;
+    const proposedGasLimit = Math.round(estimateGas * 1.2);
+    
+    return [gasPrice, estimateGas, costEstimate, proposedGasLimit];
+};

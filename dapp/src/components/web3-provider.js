@@ -23,7 +23,7 @@ class Web3Provider extends React.Component {
         currentProvider: null,
         accounts: [],
         network: {},
-        error: false
+        web3_error: false
     };
 
 
@@ -34,7 +34,7 @@ class Web3Provider extends React.Component {
             const accounts = await web3.eth.getAccounts();
             this.setState({ accounts });
         } catch(error) {
-            this.setState({ error: `Error retreiving accounts: ${error}`});
+            this.setState({ web3_error: `Error retreiving accounts: ${error}`});
         }
         
         // Get connected network info
@@ -43,7 +43,7 @@ class Web3Provider extends React.Component {
             const network = networkDetails(networkId);
             this.setState({ network });
         } catch(error) {
-            this.setState({ error: `Error retreiving network info: ${error}`});
+            this.setState({ web3_error: `Error retreiving network info: ${error}`});
         }
     }
     
@@ -135,7 +135,7 @@ class Web3Provider extends React.Component {
                                       currentProvider: this.state.currentProvider,
                                       accounts: this.state.accounts,
                                       network: this.state.network,
-                                      error: this.state.error
+                                      web3_error: this.state.web3_error
                                   }}>
               {this.props.children}
             </Web3Context.Provider>
@@ -163,7 +163,7 @@ export const withWeb3 = (WrappedComponent) => {
                             currentProvider={context.currentProvider}
                             accounts={context.accounts}
                             network={context.network}
-                            error={context.error}
+                            web3_error={context.web3_error}
                             />
                       }
                 </Web3Context.Consumer>
